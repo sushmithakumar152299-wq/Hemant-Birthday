@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Welcome</title>
+
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  background:black;
+  overflow:hidden;
+  font-family: Arial, sans-serif;
+  color:white;
+  text-align:center;
+}
+
+/* typing intro */
+.title{
+  font-size: clamp(40px, 8vw, 120px);
+  border-right:4px solid white;
+  white-space:nowrap;
+  overflow:hidden;
+  width:0;
+  animation:typing 4s steps(30,end) forwards, blink .8s infinite;
+}
+.subtitle{
+  font-size: clamp(30px, 6vw, 80px);
+  border-right:4px solid white;
+  white-space:nowrap;
+  overflow:hidden;
+  width:0;
+  animation:typing 3s steps(20,end) forwards 4s, blink .8s infinite 4s;
+}
+@keyframes typing{from{width:0}to{width:100%}}
+@keyframes blink{50%{border-color:transparent}}
+.title,.subtitle{text-shadow:0 0 20px rgba(255,255,255,.8)}
+
+.btn{
+  margin-top:60px;
+  padding:14px 30px;
+  font-size:20px;
+  border:2px solid white;
+  background:transparent;
+  color:white;
+  cursor:pointer;
+  opacity:0;
+  transition:.4s;
+}
+.btn:hover{background:white;color:black}
+.show{opacity:1}
+
+/* balloons */
+.balloon{
+ position:absolute;
+ font-size:30px;
+ animation:rise 8s linear infinite;
+}
+@keyframes rise{from{transform:translateY(100vh)}to{transform:translateY(-10vh)}}
+
+/* spark bursts */
+.spark{
+ position:absolute;
+ width:4px;height:4px;
+ background:white;
+ border-radius:50%;
+ animation:burst 1s ease-out forwards;
+}
+@keyframes burst{to{transform:scale(4);opacity:0}}
+
+/* cake screen */
+#cakeScreen{
+ display:none;
+ position:fixed;
+ inset:0;
+ background:url('assets/cartoon-bg.jpg') center/cover no-repeat;
+ justify-content:center;
+ align-items:center;
+ flex-direction:column;
+ z-index:10;
+}
+
+/* clouds */
+.cloud{
+ position:absolute;
+ font-size:40px;
+ opacity:.8;
+ animation:cloudMove 40s linear infinite;
+}
+@keyframes cloudMove{
+ from{transform:translateX(-10vw)}
+ to{transform:translateX(110vw)}
+}
+
+/* rainbow */
+.rainbow{
+ position:absolute;
+ top:10%;
+ font-size:80px;
+ opacity:.4;
+}
+
+/* floating hearts */
+.heartFloat{
+ position:absolute;
+ color:#ff6fa5;
+ font-size:18px;
+ animation:heartRise 6s linear infinite;
+}
+@keyframes heartRise{
+ from{transform:translateY(40px);opacity:1}
+ to{transform:translateY(-80px);opacity:0}
+}
+
+/* romantic text */
+.luckText{
+ font-size:28px;
+ font-weight:bold;
+ text-shadow:0 0 12px rgba(0,0,0,.6);
+}
+
+/* glowing timer */
+#lifeTimer{
+ font-size:26px;
+ margin:15px 0 25px;
+ text-shadow:0 0 8px #fff,0 0 18px #fff,0 0 35px #ffd6f0;
+}
+
+/* cake */
+.cake{font-size:120px;cursor:pointer}
+.cutText{font-size:20px;margin-top:10px}
+
+/* slice */
+.slice{
+ position:fixed;
+ font-size:70px;
+ top:45%;left:50%;
+ transform:translate(-50%,-50%);
+ animation:sliceDrop 1s forwards;
+ z-index:50;
+}
+@keyframes sliceDrop{
+ from{transform:translate(-50%,-200%);opacity:0}
+ to{transform:translate(-50%,-50%);opacity:1}
+}
+
+/* fireworks */
+.firework{
+ position:fixed;
+ width:6px;height:6px;
+ background:white;
+ border-radius:50%;
+ animation:explode 1s forwards;
+}
+@keyframes explode{to{transform:scale(6);opacity:0}}
+
+/* spark trails */
+.sparkTrail{
+ position:fixed;
+ width:3px;height:20px;
+ background:white;
+ transform-origin:center;
+ animation:trailMove 1s forwards;
+}
+@keyframes trailMove{
+ to{transform:rotate(var(--a)) translateY(200px);opacity:0}
+}
+
+/* glowing name */
+.nameSpark{
+ position:fixed;
+ font-size:48px;
+ font-weight:bold;
+ opacity:0;
+ text-shadow:0 0 10px #fff,0 0 25px #fff,0 0 45px #fff;
+ animation:nameAppear 2s forwards;
+}
+@keyframes nameAppear{
+ to{opacity:1;transform:translateY(-10px)}
+}
+</style>
+</head>
+
+<body>
+
+<div id="intro">
+  <div class="title">HAPPY BIRTHDAY</div>
+  <div class="subtitle">HEMANT</div>
+  <button class="btn" id="celebrateBtn" onclick="showCake()">Let’s Celebrate</button>
+</div>
+
+<div id="cakeScreen">
+  <div class="rainbow">🌈</div>
+  <div class="luckText">My world became more beautiful since you arrived 🌹</div>
+  <div id="lifeTimer"></div>
+  <div class="cake" onclick="cutCake()">🎂</div>
+  <div class="cutText">Tap the cake to cut 🎉</div>
+</div>
+
+<!-- 🎵 MUSIC -->
+<audio id="bgMusic" preload="auto" loop>
+  <source src="assets/music2.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+// 🎵 start music on load (with fallback)
+window.addEventListener("load", () => {
+  const music = document.getElementById("bgMusic");
+  music.volume = 0.35;
+
+  const playPromise = music.play();
+
+  if (playPromise !== undefined) {
+    playPromise.catch(() => {
+      document.body.addEventListener("click", () => {
+        music.play();
+      }, { once: true });
+    });
+  }
+});
+
+// show button
+setTimeout(()=>celebrateBtn.classList.add("show"),7500);
+
+// balloons
+setInterval(()=>{
+ let b=document.createElement("div");
+ b.className="balloon";
+ b.innerHTML="🎈";
+ b.style.left=Math.random()*100+"vw";
+ document.body.appendChild(b);
+ setTimeout(()=>b.remove(),8000);
+},1000);
+
+// clouds
+setInterval(()=>{
+ let c=document.createElement("div");
+ c.className="cloud";
+ c.innerHTML="☁️";
+ c.style.top=Math.random()*40+"%";
+ document.body.appendChild(c);
+ setTimeout(()=>c.remove(),40000);
+},6000);
+
+// hearts
+setInterval(()=>{
+ let h=document.createElement("div");
+ h.className="heartFloat";
+ h.innerHTML="💗";
+ h.style.left=Math.random()*100+"vw";
+ h.style.bottom="10px";
+ document.body.appendChild(h);
+ setTimeout(()=>h.remove(),6000);
+},800);
+
+// spark bursts
+function sparkBurst(x,y){
+ for(let i=0;i<15;i++){
+  let s=document.createElement("div");
+  s.className="spark";
+  s.style.left=x+"px";
+  s.style.top=y+"px";
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(),1000);
+ }
+}
+
+// life timer
+const birthDate=new Date("2000-03-22T00:00:00");
+setInterval(()=>{
+ let diff=new Date()-birthDate;
+ let mins=Math.floor(diff/60000);
+ let secs=Math.floor((diff%60000)/1000);
+ lifeTimer.innerHTML=mins.toLocaleString()+" minutes "+secs+" seconds";
+},1000);
+
+// show cake
+function showCake(){
+ intro.style.display="none";
+ cakeScreen.style.display="flex";
+}
+
+// name glow
+function formName(text){
+ let cx=window.innerWidth/2;
+ let cy=window.innerHeight/2;
+ let start=cx-(text.length*20);
+ for(let i=0;i<text.length;i++){
+  let l=document.createElement("div");
+  l.className="nameSpark";
+  l.innerHTML=text[i];
+  l.style.left=start+i*40+"px";
+  l.style.top=cy-60+"px";
+  document.body.appendChild(l);
+ }
+}
+
+// cake celebration
+function cutCake(){
+
+ let slice=document.createElement("div");
+ slice.className="slice";
+ slice.innerHTML="🍰";
+ document.body.appendChild(slice);
+
+ for(let i=0;i<60;i++){
+  let fw=document.createElement("div");
+  fw.className="firework";
+  fw.style.left=Math.random()*100+"vw";
+  fw.style.top=Math.random()*100+"vh";
+  document.body.appendChild(fw);
+  setTimeout(()=>fw.remove(),1000);
+ }
+
+ sparkBurst(innerWidth/2,innerHeight/2);
+
+ setTimeout(()=>formName("HEMANT"),900);
+
+ setTimeout(()=>window.location.href="homee.html",4200);
+}
+</script>
+
+</body>
+</html>
