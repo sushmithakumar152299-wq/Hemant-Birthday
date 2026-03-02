@@ -72,5 +72,23 @@
 </div>
 
 <script src="script.js"></script>
+
+  <script>
+window.addEventListener("load", () => {
+  const music = document.getElementById("bgMusic");
+  music.volume = 0.35;
+
+  const playPromise = music.play();
+
+  if (playPromise !== undefined) {
+    playPromise.catch(() => {
+      document.body.addEventListener("click", () => {
+        music.play();
+      }, { once: true });
+    });
+  }
+});
+</script>
+  
 </body>
 </html>
